@@ -1,0 +1,124 @@
+---
+title: "A3"
+output: html_document
+date: "2026-02-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#
+# STEP CHART WITH MULTIPLE LINES
+#
+
+
+# Load data
+wins <- read.csv("data/nba-playoff-win-counts-2017.tsv", sep="\t", stringsAsFactors=FALSE)
+
+# Setup plot window
+xlim <- c(0, dim(wins)[2]-1)
+ylim <- c(min(wins[,-1], na.rm=TRUE), max(wins[,-1], na.rm=TRUE))
+plot(0, 0, xlim=xlim, ylim=ylim, type="n", xlab="Games Played", ylab="Wins")
+
+
+#
+# Single step line
+#
+
+xlim <- c(0, dim(wins)[2]-1)
+ylim <- c(min(wins[,-1], na.rm=TRUE), max(wins[,-1], na.rm=TRUE))
+plot(0, 0, xlim=xlim, ylim=ylim, type="n", xlab="Games Played", ylab="Wins", bty="n", las=1)
+curr <- as.numeric(wins[1, -1])
+x <- 0
+y <- curr[1]
+for (j in 2:length(curr)) {
+    
+    if (is.na(curr[j])) {
+        break
+    }
+    
+    if (curr[j] != y[length(y)]) {
+        x <- c(x, x[length(x)], x[length(x)]+1)
+        y <- c(y, curr[j], curr[j])
+    } else {
+        x <- c(x, x[length(x)]+1)
+        y <- c(y, curr[j])
+    }
+}
+lines(x, y)
+
+
+
+#
+# Multiple step line plot
+#
+xlim <- c(0, 1.2*dim(wins)[2]-1)
+ylim <- c(min(wins[,-1], na.rm=TRUE), max(wins[,-1], na.rm=TRUE))
+plot(0, 0, xlim=xlim, ylim=ylim, type="n", xlab="Games Played", ylab="Wins", bty="n", las=1)
+
+for (i in 1:dim(wins)[1]) {
+    curr <- as.numeric(wins[i, -1])
+    x <- 0
+    y <- curr[1]
+    for (j in 2:length(curr)) {
+        
+        if (is.na(curr[j])) {
+            break
+        }
+        
+        if (curr[j] != y[length(y)]) {
+            x <- c(x, x[length(x)], x[length(x)]+1)
+            y <- c(y, curr[j], curr[j])
+        } else {
+            x <- c(x, x[length(x)]+1)
+            y <- c(y, curr[j])
+        }
+    }
+    lines(x, y, col="#00000040")
+    points(x[length(x)], y[length(y)], col="red", pch=19)
+    text(x[length(x)], y[length(y)], wins[i,1], pos=4)
+}
+
+
+
+
+#
+# You don't have to calculate the coordinates yourself
+#
+
+xlim <- c(0, dim(wins)[2]-1)
+ylim <- c(min(wins[,-1], na.rm=TRUE), max(wins[,-1], na.rm=TRUE))
+plot(0, 0, xlim=xlim, ylim=ylim, type="n", xlab="Games Played", ylab="Wins", bty="n", las=1)
+for (i in 1:dim(wins)[1]) {
+    curr <- as.numeric(wins[i, -1])
+    lines(curr, col="#00000040", type="s")
+}
+
+
+
+#
+# ...unless you still want labels
+#
+
+
+xlim <- c(0, 1.2 * (dim(wins)[2]-1))
+ylim <- c(min(wins[,-1], na.rm=TRUE), max(wins[,-1], na.rm=TRUE))
+plot(0, 0, xlim=xlim, ylim=ylim, type="n", xlab="Games Played", ylab="Wins", bty="n", las=1)
+for (i in 1:dim(wins)[1]) {
+    curr <- as.numeric(wins[i, -1])
+    lines(curr, col="#00000040", type="s")
+    
+    curr_na <- which(is.na(curr))
+    if (length(curr_na) > 0) {
+        x_last <- curr_na[1]-1
+        y_last <- curr[curr_na[1]-1]
+    } else {
+        x_last <- length(curr)
+        y_last <- curr[length(curr)]
+    }
+    points(x_last, y_last, col="red", pch=19)
+    text(x_last, y_last, wins[i,1], pos=4)
+}
+
+
